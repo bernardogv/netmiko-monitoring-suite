@@ -1,0 +1,106 @@
+# Network Monitoring Configuration Template
+
+# Global settings
+global:
+  timeout: 30
+  max_workers: 10
+  retry_attempts: 3
+  retry_delay: 5
+
+# Logging configuration
+logging:
+  level: INFO
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  log_to_file: true
+  log_directory: ../logs
+  max_log_size: 10485760  # 10MB
+  backup_count: 5
+
+# Device configurations
+devices:
+  - name: "router1"
+    hostname: "192.168.1.1"
+    device_type: "cisco_ios"
+    port: 22
+    
+  - name: "switch1"
+    hostname: "192.168.1.10"
+    device_type: "cisco_ios"
+    port: 22
+    
+  - name: "firewall1"
+    hostname: "192.168.1.20"
+    device_type: "cisco_asa"
+    port: 22
+
+# Monitoring tasks
+monitoring:
+  # CPU and Memory monitoring
+  resource_monitoring:
+    enabled: true
+    interval: 300  # seconds
+    thresholds:
+      cpu_warning: 70
+      cpu_critical: 90
+      memory_warning: 75
+      memory_critical: 90
+      
+  # Interface monitoring
+  interface_monitoring:
+    enabled: true
+    interval: 60
+    monitor_interfaces:
+      - "GigabitEthernet0/0"
+      - "GigabitEthernet0/1"
+    thresholds:
+      utilization_warning: 70
+      utilization_critical: 90
+      error_rate_threshold: 0.01  # 1%
+      
+  # Configuration backup
+  config_backup:
+    enabled: true
+    schedule: "daily"  # daily, weekly, monthly
+    backup_directory: ../output/backups
+    retention_days: 30
+    
+  # Health checks
+  health_checks:
+    enabled: true
+    interval: 600
+    checks:
+      - ping
+      - routing_table
+      - interface_status
+      - bgp_neighbors
+      - ospf_neighbors
+
+# Output settings
+output:
+  reports_directory: ../output/reports
+  format: "html"  # html, csv, json
+  email_notifications:
+    enabled: false
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    use_tls: true
+    from_address: "monitoring@example.com"
+    to_addresses:
+      - "admin@example.com"
+    
+# Commands to run on devices
+commands:
+  cisco_ios:
+    cpu: "show processes cpu"
+    memory: "show memory statistics"
+    interfaces: "show interfaces"
+    config: "show running-config"
+    version: "show version"
+    inventory: "show inventory"
+    
+  cisco_asa:
+    cpu: "show cpu usage"
+    memory: "show memory"
+    interfaces: "show interface"
+    config: "show running-config"
+    version: "show version"
